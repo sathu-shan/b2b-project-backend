@@ -1,0 +1,20 @@
+{
+  "name": "b2b-project-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abi-Kiruba/b2b-project-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abi-Kiruba/b2b-project-backend/issues"
+  },
+  "homepage": "https://github.com/Abi-Kiruba/b2b-project-backend#readme"
+}
