@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const logger = require('./logger'); 
 
 const connection = mysql.createConnection({
   host: 'localhost',

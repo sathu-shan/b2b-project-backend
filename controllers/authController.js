@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const logger = require('../config/logger'); 
 
 class AuthController {
   static async registerUser(req, res) {
@@ -31,6 +32,9 @@ class AuthController {
         contactNumber,
         displayName,
       });
+
+       // Log the successful registration
+       logger.info(`Investor successfully signed up: ${email}`);
 
       // Respond with success message
       res.status(201).json({ message: 'User registered successfully' });
