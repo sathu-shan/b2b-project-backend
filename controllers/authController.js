@@ -40,9 +40,9 @@ class AuthController {
       logger.info(`Investor successfully signed up: ${email}`);
 
       // Respond with success message
-      res.status(201).json({ message: 'User registered successfully' });
+      res.status(201).json({ message: 'Investor signed up successfully' });
     } catch (error) {
-      console.error('Error registering user:', error);
+      console.error('Error registering investor:', error);
       res.status(500).json({ message: 'An error occurred' });
     }
   }
