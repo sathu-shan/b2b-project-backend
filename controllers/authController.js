@@ -1,5 +1,6 @@
+const db = require('../config/db');
+const logger = require('../config/logger');
 const User = require('../models/User');
-const logger = require('../config/logger'); 
 
 class AuthController {
   static async registerUser(req, res) {
@@ -24,17 +25,19 @@ class AuthController {
         return res.status(400).json({ message: 'Invalid display name' });
       }
 
-      // Create a new user in the database
-      const newUser = await User.create({
+      // Create a new user in the database using prepared statement
+      const insertUserQuery = 'INSERT INTO users SET ?';
+      const user = {
         email,
         password,
         companyName,
         contactNumber,
         displayName,
-      });
+      };
+      await db.query(insertUserQuery, user);
 
-       // Log the successful registration
-       logger.info(`Investor successfully signed up: ${email}`);
+      // Log the successful registration
+      logger.info(`Investor successfully signed up: ${email}`);
 
       // Respond with success message
       res.status(201).json({ message: 'User registered successfully' });
@@ -71,4 +74,3 @@ function isValidDisplayName(displayName) {
 }
 
 module.exports = AuthController;
-
