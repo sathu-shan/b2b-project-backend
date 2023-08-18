@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Abi-Kiruba/b2b-project-backend/issues"
   },
-  "homepage": "https://github.com/Abi-Kiruba/b2b-project-backend#readme"
+  "homepage": "https://github.com/Abi-Kiruba/b2b-project-backend#readme",
+  "dependencies": {
+    "winston": "^3.10.0"
+  }
 }
