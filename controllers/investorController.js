@@ -17,6 +17,11 @@ class InvestorController {
         investmentIndustryPreferences
       } = req.body;
 
+       // Validate fields
+       if (firstName.length <= 3 || lastName.length <= 3 || address.length <= 3) {
+        return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
+      }
+
       // Create a new investor in the database using prepared statement
       const insertInvestorQuery = `
         INSERT INTO investors (
