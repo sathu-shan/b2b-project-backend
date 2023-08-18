@@ -36,7 +36,7 @@ class AuthController {
       };
       await db.query(insertUserQuery, user);
 
-      // Log the successful registration
+      // Log the successful signup
       logger.info(`Investor successfully signed up: ${email}`);
 
       // Respond with success message

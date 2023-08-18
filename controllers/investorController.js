@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const logger = require('../config/logger');
 
 class InvestorController {
   static async registerInvestor(req, res) {
@@ -44,6 +45,9 @@ class InvestorController {
         investmentType,
         investmentIndustryPreferences.join(',') // Convert array to comma-separated string
       ]);
+
+       // Log the successful register
+       logger.info(`Investor successfully registerd: ${firstName}`);
 
       // Respond with success message
       res.status(201).json({ message: 'Investor registered successfully' });
