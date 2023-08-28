@@ -1,12 +1,12 @@
-const db = require('../config/db');
 const logger = require('../config/logger');
-const User = require('../models/User');
+const User = require('../models/User'); // Use Sequelize User model
+const bcrypt = require('bcrypt')
 
 class AuthController {
   static async registerUser(req, res) {
     try {
       // Extract user data from request body
-      const { email, password, companyName, contactNumber, displayName } = req.body;
+      const { email, password, companyName, contactNumber, displayName, type } = req.body;
 
       // Perform validation checks
       if (!isValidEmail(email)) {
@@ -24,31 +24,32 @@ class AuthController {
       if (!isValidDisplayName(displayName)) {
         return res.status(400).json({ message: 'Invalid display name' });
       }
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create a new user in the database using prepared statement
-      const insertUserQuery = 'INSERT INTO users SET ?';
-      const user = {
+      // Create a new user using Sequelize model
+      const user = await User.create({
         email,
-        password,
+        password:hashedPassword,
         companyName,
         contactNumber,
         displayName,
-      };
-      await db.query(insertUserQuery, user);
+        type,
+      });
 
       // Log the successful signup
-      logger.info(`Investor successfully signed up: ${email}`);
+      logger.info(`${type === 1 ? 'Company' : 'Investor'} successfully signed up: ${email}`);
 
       // Respond with success message
-      res.status(201).json({ message: 'Investor signed up successfully' });
+      res.status(201).json({ message: `${type === 1 ? 'Company' : 'Investor'} signed up successfully` });
     } catch (error) {
-      console.error('Error registering investor:', error);
+      console.error('Error registering user:', error);
       res.status(500).json({ message: 'An error occurred' });
     }
   }
-}
 
-// Validation functions
+}
+  // ... (validation functions and other methods)
+  // Validation functions
 function isValidEmail(email) {
   // Use a regular expression to validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -71,6 +72,8 @@ function isValidContactNumber(contactNumber) {
 
 function isValidDisplayName(displayName) {
   return displayName.length > 3;
+
 }
+
 
 module.exports = AuthController;

@@ -1,53 +1,54 @@
-const db = require('../config/db');
+const Investor = require('../models/Investor'); // Use Sequelize Investor model
 const logger = require('../config/logger');
 
 class InvestorController {
   static async registerInvestor(req, res) {
     try {
       const {
+        // Extract fields from req.body
         firstName,
         lastName,
         country,
         address,
         companyRole,
-        totalEmployees,
-        assetsValue,
+        numberOfEmployees,
+        assetsUnderManagement,
         investorType,
         investorTypeDescription,
         investmentType,
-        investmentIndustryPreferences
+        investmentTypeDescription,
+        investmentIndustryPreference1,
+        investmentIndustryPreference2,
+        investmentIndustryPreference3,
+        investmentIndustryPreference4,
       } = req.body;
 
-       // Validate fields
-       if (firstName.length <= 3 || lastName.length <= 3 || address.length <= 3) {
+      // Validate fields (similar validation as before)
+      if (firstName.length <= 3 || lastName.length <= 3 || address.length <= 3 || companyRole.length <= 3 || address.length <= 5) {
         return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
       }
-
-      // Create a new investor in the database using prepared statement
-      const insertInvestorQuery = `
-        INSERT INTO investors (
-          first_name, last_name, country, address, company_role,
-          total_employees, assets_value, investor_type, investor_type_description,
-          investment_type, investment_industry_preferences
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-
-      await db.query(insertInvestorQuery, [
+console.log("Hello")
+      // Create a new investor using Sequelize model
+      await Investor.create({
         firstName,
         lastName,
         country,
         address,
         companyRole,
-        totalEmployees,
-        assetsValue,
+        numberOfEmployees,
+        assetsUnderManagement,
         investorType,
-        investorType === 'Other' ? investorTypeDescription : null,
+        investorTypeDescription: investorType === 'Other' ? investorTypeDescription : null,
         investmentType,
-        investmentIndustryPreferences.join(',') // Convert array to comma-separated string
-      ]);
+        investmentTypeDescription: investmentType === 'Other' ? investmentTypeDescription : null,
+        investmentIndustryPreference1,
+        investmentIndustryPreference2,
+        investmentIndustryPreference3,
+        investmentIndustryPreference4,
+      });
 
-       // Log the successful register
-       logger.info(`Investor successfully registerd: ${firstName}`);
+      // Log the successful registration
+      logger.info(`Investor successfully registered: ${firstName}`);
 
       // Respond with success message
       res.status(201).json({ message: 'Investor registered successfully' });
