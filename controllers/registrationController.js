@@ -26,6 +26,8 @@ const registerPart1 = async (req, res) => {
 
   try {
    await Company.create({
+    status: 'Pending',
+    companyName: formData.companyName,
     dateOfIncorporation:formData.dateOfIncorporation,
     partnershipType:formData.partnershipType,
     investmentType:formData.investmentType,
