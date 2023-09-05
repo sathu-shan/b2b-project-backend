@@ -1,7 +1,8 @@
 const { validationResult } = require('express-validator');
 const logger = require('../config/logger');
 const Company = require('../models/Company'); // Adjust the path accordingly
-const db = require('../config/db')
+const sequelize = require('../config/db'); // Path to your sequelize configuration
+const { Op } = require('sequelize'); // Import Sequelize's Op for query operations
 
 
 const registerPart1 = async (req, res) => {
@@ -82,6 +83,93 @@ const registerPart1 = async (req, res) => {
   }
 };
 
-module.exports = {
-  registerPart1,
+// dashboard company count getting
+
+const getCompanyStatistics = async (req, res) => {
+  try {
+    // Fetch the count of all companies using Sequelize
+    const totalCompanyCount = await Company.count();
+
+    // Define an array of column names to count
+    const columnNames = [
+      'companyIndustry1',
+      'companyIndustry2',
+      'companyIndustry3',
+      'productIndustry1',
+      'productIndustry2',
+      'productIndustry3',
+    ];
+  const columns = ['investmentType']
+    // Create an object to store the counts
+    const industryCounts = {};
+    const investmentCounts = {};
+
+    // Loop through each column and fetch counts for each value
+    for (const columnName of columnNames) {
+      const columnCounts = await Company.findAll({
+        attributes: [columnName],
+        group: [columnName],
+        raw: true,
+        where: {
+          [columnName]: {
+            [Op.not]: null, // Exclude null values
+            [Op.not]: '',   // Exclude empty strings
+          },
+        },
+      });
+
+      
+      // Calculate the counts for each value in the column
+      columnCounts.forEach((row) => {
+        const value = row[columnName];
+        industryCounts[value] = industryCounts[value] ? industryCounts[value] + 1 : 1;
+      });
+    }
+    for (const investmentType of columns) {
+    const investmentColumnCounts = await Company.findAll({
+      attributes: [investmentType],
+      group: [investmentType],
+      raw: true,
+      where: {
+        [investmentType]: {
+          [Op.not]: null, // Exclude null values
+          [Op.not]: '',   // Exclude empty strings
+        }}});
+       // Calculate the counts for each value in the column
+       investmentColumnCounts.forEach((row) => {
+        const value = row[investmentType];
+        investmentCounts[value] = investmentCounts[value] ? investmentCounts[value] + 1 : 1;
+      })}
+
+    res.json({ totalCompanyCount, investmentCounts, industryCounts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch company counts' });
+  }
 };
+
+// const getInvestmentCountsByIndustry = async (req, res) => {
+//   try {
+//     const industry = req.query.industry;
+
+//     const investmentCounts = await Company.findAll({
+//       attributes: ['investmentType'],
+//       where: {
+//         [Op.and]: [
+//           { [industry]: industry },
+//           { investmentType: { [Op.not]: null, [Op.not]: '' } },
+//         ],
+//       },
+//       group: ['investmentType'],
+//       raw: true,
+//     });
+
+//     res.json({ industry, investmentCounts });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Failed to fetch investment counts' });
+//   }
+// };
+
+
+module.exports = {registerPart1,getCompanyStatistics};
