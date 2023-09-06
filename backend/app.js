@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const investorRoutes = require('./routes/investorRoutes');
 const registrationRoutes = require('./routes/registrationRoutes');
-const s3Routes = require('./routes/s3Routes');
+const s3Routes = require('./routes/s3Routes')
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const { validationResult, check } = require("express-validator");
@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(cors(
   {
     origin: ["http://localhost:3000"],
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true,
   }
 ));
@@ -27,7 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/investor', investorRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api/users', userRoute);
-app.use('/api', s3Routes);
+app.use('/api/upload', s3Routes)
 
 // Sync Sequelize models with the database
 sequelize.sync()

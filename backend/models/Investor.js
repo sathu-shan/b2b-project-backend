@@ -5,6 +5,11 @@ class Investor extends Model {}
 
 
 Investor.init({
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+
   firstName: {
     type: DataTypes.STRING,
     allowNull: false,

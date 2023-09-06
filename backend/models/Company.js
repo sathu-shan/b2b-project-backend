@@ -4,12 +4,14 @@ const sequelize = require('../config/db'); // Path to your sequelize configurati
 class Company extends Model {}
 
 Company.init({
+  companyName: DataTypes.STRING,
+  status: DataTypes.STRING,
   dateOfIncorporation: DataTypes.DATE,
   partnershipType: DataTypes.STRING,
   investmentType: DataTypes.STRING,
   investmentTypeDescription: DataTypes.STRING,
   elevatorPitch: DataTypes.STRING,
-  partnershipRequirement: DataTypes.STRING, 
+  partnershipRequirement: DataTypes.STRING,
   whatOnOffer: DataTypes.STRING,
   isSustainable: DataTypes.STRING,
   numberOfEmployees: DataTypes.STRING,
@@ -43,7 +45,7 @@ Company.init({
   keyValueProposition: DataTypes.STRING,
   stakeholders: DataTypes.JSON,
   companyCollaterals: DataTypes.JSON,
-  ompanyReferrals: DataTypes.JSON
+  companyReferrals: DataTypes.JSON
 
 }, {
   sequelize,
