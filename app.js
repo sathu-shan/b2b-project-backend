@@ -28,7 +28,7 @@ app.use(cors(
 app.use(cookieParser());
 
 app.use('/auth', authRoutes);
-app.use('/investor', investorRoutes);
+app.use('/api/investors', investorRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api/users', userRoute);
 app.use('/api/upload', s3Routes);
