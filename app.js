@@ -5,6 +5,7 @@ const investorRoutes = require('./routes/investorRoutes');
 const registrationRoutes = require('./routes/registrationRoutes');
 const s3Routes = require('./routes/s3Routes')
 const companyRoutes = require('./routes/companyRoute');
+const meetingRoutes = require('./routes/meetingRoutes');
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const { validationResult, check } = require("express-validator");
@@ -12,6 +13,8 @@ const app = express();
 const userRoute = require('./routes/auth');
 const sequelize = require('./config/db'); // Import Sequelize configuration
 const PORT = 3001;
+
+const Meeting = require('./models/Meeting');
 
 app.use(bodyParser.json());
 app.use(cors(
@@ -29,16 +32,16 @@ app.use('/investor', investorRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api/users', userRoute);
 app.use('/api/upload', s3Routes);
-app.use('/api/companies', companyRoutes)
+app.use('/api/companies', companyRoutes);
+app.use('/api/meetings', meetingRoutes);
 
 // Sync Sequelize models with the database
-sequelize.sync()
-  .then(() => {
-    console.log('Database synced');
-  })
-  .catch(error => {
-    console.error('Error syncing database:', error);
-  });
+const syncAllModels = async () => {
+    await sequelize.sync();
+    await Meeting.sync();
+}
+
+syncAllModels();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
