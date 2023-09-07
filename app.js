@@ -6,6 +6,7 @@ const registrationRoutes = require('./routes/registrationRoutes');
 const s3Routes = require('./routes/s3Routes')
 const companyRoutes = require('./routes/companyRoute');
 const meetingRoutes = require('./routes/meetingRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const { validationResult, check } = require("express-validator");
@@ -15,6 +16,8 @@ const sequelize = require('./config/db'); // Import Sequelize configuration
 const PORT = 3001;
 
 const Meeting = require('./models/Meeting');
+const Notification = require('./models/Notification');
+const NotificationVisibility = require('./models/NotificationVisibility');
 
 app.use(bodyParser.json());
 app.use(cors(
@@ -34,11 +37,14 @@ app.use('/api/users', userRoute);
 app.use('/api/upload', s3Routes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/meetings', meetingRoutes);
+app.use('/api/notification', notificationRoutes);
 
 // Sync Sequelize models with the database
 const syncAllModels = async () => {
     await sequelize.sync();
     await Meeting.sync();
+    await Notification.sync();
+    await NotificationVisibility.sync();
 }
 
 syncAllModels();
