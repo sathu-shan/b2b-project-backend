@@ -41,22 +41,22 @@ const getAllNotificationsAccordingToUser = async (req, res) => {
             const selectedNotificationViewed = await NotificationVisibility.findAll({
                 where: {
                     notificationId: dataValues.id,
-                    viewedName: {
-                        [Sequelize.Op.not]: user
-                    }
+                    viewedName: user
                 }
             });
+
+            //console.log(selectedNotificationViewed);
 
             dataValues.viewed = selectedNotificationViewed.length !== 0;
 
             const selectedNotificationRead = await NotificationVisibility.findAll({
                 where: {
                     notificationId: dataValues.id,
-                    readName: {
-                        [Sequelize.Op.not]: user
-                    }
+                    readName: user
                 }
             });
+
+            //console.log(selectedNotificationRead);
 
             dataValues.read = selectedNotificationRead.length !== 0;
         }
@@ -71,11 +71,15 @@ const getAllNotificationsAccordingToUser = async (req, res) => {
 
 const markAsViewed = async (req, res) => {
     try{
-        const { readName, notificationId } = req.body;
+        const { readName, notificationId, viewedName } = req.body;
 
         await NotificationVisibility.create({
-
+            notificationId: notificationId,
+            readName: readName,
+            viewedName: viewedName
         });
+
+        return res.status(200).json({message: 'success'});
 
     }catch (error){
         console.error('Error in notification controller:', error);
@@ -83,7 +87,27 @@ const markAsViewed = async (req, res) => {
     }
 }
 
+const markAsReaded = async (req, res) => {
+    try{
+        const { readName, notificationId, viewedName } = req.body;
+
+        await NotificationVisibility.create({
+            notificationId: notificationId,
+            readName: readName,
+            viewedName: viewedName
+        });
+
+        return res.status(200).json({message: 'success'});
+
+    }catch(error){
+        console.error('Error in notification controller:', error);
+        return res.status(500).json({ message: 'Internal Server Error', status: 500 });
+    }
+}
+
 module.exports = {
     createNewNotification,
-    getAllNotificationsAccordingToUser
+    getAllNotificationsAccordingToUser,
+    markAsViewed,
+    markAsReaded
 }
