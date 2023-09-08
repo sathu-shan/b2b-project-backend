@@ -28,12 +28,13 @@ class AuthController {
 
       // Create a new user using Sequelize model
       const user = await User.create({
-        email,
-        password:hashedPassword,
-        companyName,
-        contactNumber,
-        displayName,
-        type,
+        email: email,
+        password: hashedPassword,
+        companyName: companyName,
+        contactNumber: contactNumber,
+        displayName: displayName,
+        type: type,
+        status: 'Not Registered'
       });
 
       // Log the successful signup

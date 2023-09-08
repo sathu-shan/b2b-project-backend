@@ -7,17 +7,18 @@ class InvestorController {
 
 const registerInvestor = async (req, res) => {
   try {
-    const { firstName, lastName, country, address, companyRole, numberOfEmployees, assetsUnderManagement, investorType,
+    const { userId, firstName, lastName, country, address, companyRole, numberOfEmployees, assetsUnderManagement, investorType,
       investorTypeDescription, investmentType, investmentTypeDescription, investmentIndustryPreference1,
-      investmentIndustryPreference2, investmentIndustryPreference3, investmentIndustryPreference4,} = req.body;
+      investmentIndustryPreference2, investmentIndustryPreference3, investmentIndustryPreference4 } = req.body;
 
     // Validate fields (similar validation as before)
-    if (firstName.length <= 3 || lastName.length <= 3 || address.length <= 3 || companyRole.length <= 3 || address.length <= 5) {
+    if (firstName.length <= 3 || lastName.length <= 3) {
       return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
     }
 
     // Create a new investor using Sequelize model
     await Investor.create({
+      userId,
       firstName,
       lastName,
       country,
@@ -26,9 +27,9 @@ const registerInvestor = async (req, res) => {
       numberOfEmployees,
       assetsUnderManagement,
       investorType,
-      investorTypeDescription: investorType === 'Other' ? investorTypeDescription : null,
+      investorTypeDescription: investorTypeDescription,
       investmentType,
-      investmentTypeDescription: investmentType === 'Other' ? investmentTypeDescription : null,
+      investmentTypeDescription: investmentTypeDescription,
       investmentIndustryPreference1,
       investmentIndustryPreference2,
       investmentIndustryPreference3,

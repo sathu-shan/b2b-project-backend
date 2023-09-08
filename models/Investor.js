@@ -5,6 +5,10 @@ class Investor extends Model {}
 
 
 Investor.init({
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   firstName: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -17,27 +21,27 @@ Investor.init({
 
   country: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   address: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   companyRole: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   numberOfEmployees: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
 
   assetsUnderManagement: {
     type: DataTypes.DECIMAL,
-    allowNull: false,
+    allowNull: true,
   },
 
   investorType: {
@@ -51,7 +55,7 @@ Investor.init({
   },
 
   investmentType: {
-    type: DataTypes.STRING,
+    type: DataTypes.JSON,
     allowNull: false,
   },
 
@@ -62,7 +66,7 @@ Investor.init({
 
   investmentIndustryPreference1: {
     type: DataTypes.STRING,
-    allowNull:true,
+    allowNull:false,
   },
 
   investmentIndustryPreference2: {

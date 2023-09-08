@@ -18,6 +18,7 @@ const PORT = 3001;
 const Meeting = require('./models/Meeting');
 const Notification = require('./models/Notification');
 const NotificationVisibility = require('./models/NotificationVisibility');
+const Investor = require('./models/Investor');
 
 app.use(bodyParser.json());
 app.use(cors(
@@ -30,7 +31,7 @@ app.use(cors(
 
 app.use(cookieParser());
 
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/investors', investorRoutes);
 app.use('/api', registrationRoutes);
 app.use('/api/users', userRoute);
@@ -45,6 +46,7 @@ const syncAllModels = async () => {
     await Meeting.sync();
     await Notification.sync();
     await NotificationVisibility.sync();
+    await Investor.sync();
 }
 
 syncAllModels();

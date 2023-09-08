@@ -29,6 +29,10 @@ User.init({
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
 }, {
   sequelize,
   modelName: 'User',
