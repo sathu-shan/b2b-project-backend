@@ -1,111 +1,163 @@
-const Investor = require('../models/Investor'); // Use Sequelize Investor model
-const logger = require('../config/logger');
-const { Op } = require('sequelize'); // Import Sequelize's Op for query operations
+const { Sequelize } = require("sequelize");
 
-const registerInvestor = async (req, res) => {
-  try {
-    const { userId, firstName, lastName, country, address, companyRole, numberOfEmployees, assetsUnderManagement, investorType,
-      investorTypeDescription, investmentType, investmentTypeDescription, investmentIndustryPreference1,
-      investmentIndustryPreference2, investmentIndustryPreference3, investmentIndustryPreference4 } = req.body;
+const Investor = require('../models/Investor');
+const InvestmentType = require('../models/InvestmentType');
 
-    // Validate fields (similar validation as before)
-    if (firstName.length <= 3 || lastName.length <= 3) {
-      return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
-    }
+const getAllInvestors = async (req, res) => {
+  try{
+    const finalInvestorList = [];
 
-    // Create a new investor using Sequelize model
-    await Investor.create({
-      userId,
-      firstName,
-      lastName,
-      country,
-      address,
-      companyRole,
-      numberOfEmployees,
-      assetsUnderManagement,
-      investorType,
-      investorTypeDescription: investorTypeDescription,
-      investmentType,
-      investmentTypeDescription: investmentTypeDescription,
-      investmentIndustryPreference1,
-      investmentIndustryPreference2,
-      investmentIndustryPreference3,
-      investmentIndustryPreference4,
+    const investors = await Investor.findAll({
+      include: InvestmentType,
+      attributes: ['firstName', 'lastName', 'investmentIndustryPreference1', 'investorType', 'status', 'id']
     });
 
-    // Log the successful registration
-    logger.info(`Investor successfully registered: ${firstName}`);
-
-    // Respond with success message
-    res.status(201).json({ message: 'Investor registered successfully' });
-
-  } catch (error) {
-    console.error('Error registering investor:', error);
-    res.status(500).json({ message: 'An error occurred' });
-  }
-}
-
-// dashboard investor count getting
-
-const getInvestorStatistics = async (req, res) => {
-  try {
-    // Fetch the count of all companies using Sequelize
-    const totalInvestorCount = await Investor.count();
-
-    // Define an array of column names to count
-    const columnNames = [
-      'investmentIndustryPreference1',
-      'investmentIndustryPreference2',
-      'investmentIndustryPreference3',
-      'investmentIndustryPreference4',
-    ];
-  const columns = ['investorType']
-    // Create an object to store the counts
-    const investorIndustryCounts = {};
-    const investorInvestmentCounts = {};
-
-    // Loop through each column and fetch counts for each value
-    for (const columnName of columnNames) {
-      const investorColumnCounts = await Investor.findAll({
-        attributes: [columnName],
-        group: [columnName],
-        raw: true,
-        where: {
-          [columnName]: {
-            [Op.not]: null, // Exclude null values
-            [Op.not]: '',   // Exclude empty strings
-          },
-        },
-      });
-
+    for(let investor of investors){
+      let investmentAllTypes = '';
+      const { dataValues } = investor;
+      const types = dataValues.InvestmentTypes;
+      for(let type of types){
+        investmentAllTypes = investmentAllTypes + type.InvestmentType.toString() + " ";
+      }
       
-      // Calculate the counts for each value in the column
-      investorColumnCounts.forEach((row) => {
-        const value = row[columnName];
-        investorIndustryCounts[value] = investorIndustryCounts[value] ? investorIndustryCounts[value] + 1 : 1;
-      });
-    }
-    for (const investorType of columns) {
-    const investorColumnCounts = await Investor.findAll({
-      attributes: [investorType],
-      group: [investorType],
-      raw: true,
-      where: {
-        [investorType]: {
-          [Op.not]: null, // Exclude null values
-          [Op.not]: '',   // Exclude empty strings
-        }}});
-       // Calculate the counts for each value in the column
-       investorColumnCounts.forEach((row) => {
-        const value = row[investorType];
-        investorInvestmentCounts[value] = investorInvestmentCounts[value] ? investorInvestmentCounts[value] + 1 : 1;
-      })}
+      let finalInvestor = {
+        id: investor.id,
+        investor: `${investor.firstName} ${investor.lastName}`,
+        industry: investor.investmentIndustryPreference1,
+        investorType: investor.investorType,
+        investmentType: investmentAllTypes,
+        isPending: investor.status === 'Pending' ? true : false
+      }
 
-    res.json({ totalInvestorCount, investorInvestmentCounts, investorIndustryCounts });
-  } catch (error) {
+      finalInvestorList.push(finalInvestor);
+    }
+
+    return res.status(200).json({investors: finalInvestorList});
+
+  }catch(error){
     console.error(error);
     res.status(500).json({ error: 'Failed to fetch investor counts' });
   }
-};
+}
 
-module.exports = { getInvestorStatistics, registerInvestor };
+const searchInvestors = async (req, res) => {
+  try{
+    const searchWord = req.query.search;
+    const finalInvestorList = [];
+
+    const investors = await Investor.findAll({
+      include: InvestmentType,
+      attributes: ['firstName', 'lastName', 'investmentIndustryPreference1', 'investorType', 'status', 'id'],
+      where: {
+        [Sequelize.Op.or]: [
+          {
+            firstName: {
+              [Sequelize.Op.like]: `%${searchWord}%`,
+            }
+          },
+          {
+            lastName: {
+              [Sequelize.Op.like]: `%${searchWord}%`,
+            }
+          }
+        ]
+      }
+    });
+
+    for(let investor of investors){
+      let investmentAllTypes = '';
+      const { dataValues } = investor;
+      const types = dataValues.InvestmentTypes;
+      for(let type of types){
+        investmentAllTypes = investmentAllTypes + type.InvestmentType.toString() + " ";
+      }
+      
+      let finalInvestor = {
+        id: investor.id,
+        investor: `${investor.firstName} ${investor.lastName}`,
+        industry: investor.investmentIndustryPreference1,
+        investorType: investor.investorType,
+        investmentType: investmentAllTypes,
+        isPending: investor.status === 'Pending' ? true : false
+      }
+
+      finalInvestorList.push(finalInvestor);
+    }
+
+    return res.status(200).json({investors: finalInvestorList});
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
+const filterInvestors = async (req, res) => {
+  try{
+    const industry = req.query.industry;
+    const investment = req.query.investment;
+    const finalInvestorList = [];
+
+    const investors = await Investor.findAll({
+      include: InvestmentType,
+      attributes: ['firstName', 'lastName', 'investmentIndustryPreference1', 'investorType', 'status', 'id'],
+      where: {
+        investmentIndustryPreference1: industry
+      }
+    });
+
+    
+    for(let investor of investors){
+      let investmentAllTypes = '';
+      const { dataValues } = investor;
+      const types = dataValues.InvestmentTypes;
+      const isInInvestmentType = types.findIndex(type => type.InvestmentType === investment);
+
+      if(isInInvestmentType !== -1){
+        for(let type of types){
+          investmentAllTypes = investmentAllTypes + type.InvestmentType.toString() + " ";
+        }
+        
+        let finalInvestor = {
+          id: investor.id,
+          investor: `${investor.firstName} ${investor.lastName}`,
+          industry: investor.investmentIndustryPreference1,
+          investorType: investor.investorType,
+          investmentType: investmentAllTypes,
+          isPending: investor.status === 'Pending' ? true : false
+        }
+  
+        finalInvestorList.push(finalInvestor);
+      }
+    }
+
+    return res.status(200).json({investors: finalInvestorList});
+
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
+const getAllInvestorCount = async (req, res) => {
+  try{
+    const count = await Investor.count({
+      where: {
+        status: 'Pending'
+      }
+    });
+
+    return res.status(200).json({ count: count })
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
+module.exports = { 
+  getAllInvestors,
+  searchInvestors,
+  filterInvestors,
+  getAllInvestorCount
+};
