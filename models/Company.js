@@ -4,6 +4,10 @@ const sequelize = require('../config/db'); // Path to your sequelize configurati
 class Company extends Model {}
 
 Company.init({
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
   status: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -28,7 +32,7 @@ Company.init({
      type: DataTypes.STRING,
      allowNull: false
   },
-  
+
   partnershipRequirement: {
     type: DataTypes.STRING,
     allowNull: false

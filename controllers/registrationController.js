@@ -11,6 +11,7 @@ const MarketPrecence = require('../models/MarketPrecence');
 const Collaterals = require('../models/Collaterals');
 const Referrals = require('../models/Referrals');
 const Stakeholders = require('../models/Stakeholders');
+const User = require('../models/User');
 
 const sequelize = require('../config/db'); 
 
@@ -23,6 +24,14 @@ const registerInvestor = async (req, res) => {
     if (firstName.length <= 3 || lastName.length <= 3) {
       return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
     }
+
+    await User.update({
+      status: 'Registered'
+    },{
+      where: {
+        id: userId
+      }
+    });
 
     const investor = await Investor.create({
       userId,
@@ -83,7 +92,17 @@ const registerCompany = async (req, res) => {
   }
 
   try {
+
+    await User.update({
+      status: 'Registered'
+    },{
+      where: {
+        id: formData.userId
+      }
+    });
+
    const company = await Company.create({
+    userId: formData.userId,
     status: 'Pending',
     companyName: formData.companyName,
     dateOfIncorporation: formData.dateOfIncorporation,

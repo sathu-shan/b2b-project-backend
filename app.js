@@ -7,6 +7,7 @@ const s3Routes = require('./routes/s3Routes')
 const companyRoutes = require('./routes/companyRoute');
 const meetingRoutes = require('./routes/meetingRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const { validationResult, check } = require("express-validator");
@@ -42,6 +43,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/register', registrationRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.use('/api/investors', investorRoutes);
 app.use('/api/users', userRoute);
@@ -128,7 +130,23 @@ Investor.belongsTo(User, {
   foreignKey: 'userId',
 });
 
+Company.belongsTo(User, {
+  foreignKey: 'userId',
+});
+
 syncAllModels();
+
+const createWhenInit = async () => {
+  const list = ['Start-Up', 'R&D', 'Scale-Up', 'Other'];
+  for(let listEle of list){
+    await InvestmentType.findOrCreate({
+      where: { InvestmentType: listEle }
+    });
+  }
+  console.log('Initialized');
+}
+
+createWhenInit();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
