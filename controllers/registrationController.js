@@ -1,15 +1,74 @@
 const { validationResult } = require('express-validator');
 const logger = require('../config/logger');
-const Company = require('../models/Company'); // Adjust the path accordingly
-const sequelize = require('../config/db'); // Path to your sequelize configuration
-const { Op } = require('sequelize'); // Import Sequelize's Op for query operations
+const { Op } = require('sequelize'); 
 
+const Company = require('../models/Company');
+const Investor = require('../models/Investor');
+const InvestmentType = require('../models/InvestmentType');
+const InvestorInvetmentType = require('../models/InvestorInvestmentType');
+const CompanyInvestmentType = require('../models/CompanyInvestmentType');
+const MarketPrecence = require('../models/MarketPrecence');
+const Collaterals = require('../models/Collaterals');
+const Referrals = require('../models/Referrals');
+const Stakeholders = require('../models/Stakeholders');
 
-const registerPart1 = async (req, res) => {
+const sequelize = require('../config/db'); 
+
+const registerInvestor = async (req, res) => {
+  try {
+    const { userId, firstName, lastName, country, address, companyRole, numberOfEmployees, assetsUnderManagement, investorType,
+      investorTypeDescription, investmentType, investmentTypeDescription, investmentIndustryPreference1,
+      investmentIndustryPreference2, investmentIndustryPreference3, investmentIndustryPreference4 } = req.body;
+
+    if (firstName.length <= 3 || lastName.length <= 3) {
+      return res.status(400).json({ message: 'Fields must contain more than 3 characters' });
+    }
+
+    const investor = await Investor.create({
+      userId,
+      firstName,
+      lastName,
+      country,
+      status: 'Pending',
+      address,
+      companyRole,
+      numberOfEmployees,
+      assetsUnderManagement,
+      investorType,
+      investorTypeDescription: investorTypeDescription,
+      investmentTypeDescription: investmentTypeDescription,
+      investmentIndustryPreference1,
+      investmentIndustryPreference2,
+      investmentIndustryPreference3,
+      investmentIndustryPreference4,
+    });
+
+    for(const typeName of investmentType){
+      const [investmentTypeData] = await InvestmentType.findOrCreate({
+        where: { InvestmentType: typeName }
+      });
+
+      await InvestorInvetmentType.create({
+        InvestorId: investor.id, 
+        InvestmentTypeId: investmentTypeData.id
+      });
+    }
+
+    // Log the successful registration
+    logger.info(`Investor successfully registered: ${firstName}`);
+    
+    res.status(201).json({ message: 'Investor registered successfully' });
+
+  } catch (error) {
+    console.error('Error registering investor:', error);
+    res.status(500).json({ message: 'An error occurred' });
+  }
+}
+
+const registerCompany = async (req, res) => {
   const formData = req.body;
-  console.log(formData)
-  console.log(formData.collaterals[0])
-  // Define validation rules
+  console.log(formData);
+  
   const validationRules = [
     { field: 'elevatorPitch', message: 'Elevator Pitch must contain at least 3 characters' },
     { field: 'productDescription', message: 'Product Description must contain at least 3 characters' },
@@ -18,64 +77,122 @@ const registerPart1 = async (req, res) => {
     { field: 'keyValueProposition', message: 'Key Value Proposition must contain at least 3 characters' },
   ];
 
-  // Check validation results
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   try {
-   await Company.create({
+   const company = await Company.create({
     status: 'Pending',
     companyName: formData.companyName,
-    dateOfIncorporation:formData.dateOfIncorporation,
-    partnershipType:formData.partnershipType,
-    investmentType:formData.investmentType,
-    investmentTypeDescription:formData.investmentTypeDescription,
-    elevatorPitch:formData.elevatorPitch,
-    partnershipRequirement:formData.partnershipRequirement,
+    dateOfIncorporation: formData.dateOfIncorporation,
+    partnershipType: formData.partnershipType,
+    investmentTypeDescription: formData.investmentTypeDescription,
+    elevatorPitch: formData.elevatorPitch,
+
+    partnershipRequirement: formData.partnershipRequirement,
     whatOnOffer:formData.whatOnOffer,
-    isSustainable:formData.isSustainable,
+    isSustainable: formData.isSustainable,
     numberOfEmployees:formData.numberOfEmployees,
-    productMaturity:formData.productMaturity,
-    productDescription:formData.productDescription,
+
+    productMaturity: formData.productMaturity,
+    productDescription: formData.productDescription,
+    businessProblemSolved: formData.businessProblemSolved,
+    numberOfInstallations: formData.numberOfInstallations,
+    productType: formData.productType,
+
     technologyEmployed: formData.technologyEmployed,
     technologyEmployedDescription: formData.technologyEmployedDescription,
-    collaterals:formData.collaterals && formData.collaterals.length > 0 ? JSON.stringify(formData.collaterals) : null,
-    referrals:formData.referrals && formData.referrals.length > 0 ? JSON.stringify(formData.referrals) : null,
-    productIndustry1:formData.productIndustry1,
-    productIndustry2:formData.productIndustry2,
-    productIndustry3:formData.productIndustry3,
-    natureOfBusiness:formData.natureOfBusiness,
-    companyIndustry1:formData.companyIndustry1,
-    companyIndustry2:formData.companyIndustry2,
-    companyIndustry3:formData.companyIndustry3,
-    businessProcess:formData.businessProcess,
-    companyProducts:formData.companyProducts,
-    companyResources:formData.companyResources,
-    managementEmployee:formData.managementEmployee,
-    managementExperience:formData.managementExperience,
-    technicalEmployee:formData.technicalEmployee,
-    technicalExperience:formData.technicalExperience,
-    adminEmployees:formData.adminEmployees,
+    productIndustry1: formData.productIndustry1,
+    productIndustry2: formData.productIndustry2,
+    productIndustry3: formData.productIndustry3,
+    productIndustry4: formData.productIndustry4,
+
+    natureOfBusiness: formData.natureOfBusiness,
+    companyIndustry1: formData.companyIndustry1,
+    companyIndustry2: formData.companyIndustry2,
+    companyIndustry3: formData.companyIndustry3,
+    companyIndustry4: formData.companyIndustry4,
+
+    businessProcess: formData.businessProcess,
+    companyProducts: formData.companyProducts,
+    companyResources: formData.companyResources,
+    managementEmployees: formData.managementEmployee,
+    managementExperience: formData.managementExperience,
+    technicalEmployees: formData.technicalEmployee,
+    technicalExperience: formData.technicalExperience,
+    adminEmployees: formData.adminEmployees,
     adminExperience:formData.adminExperience,
-    marketingEmployees:formData.marketingEmployees,
-    marketingExperience:formData.marketingExperience,
-    otherHrField:formData.otherHrField,
-    otherHrEmployee:formData.otherHrEmployee,
-    otherHrExperience:formData.otherHrExperience,
+    marketingEmployees: formData.marketingEmployees,
+    marketingExperience: formData.marketingExperience,
+    otherHrField: formData.otherHrField,
+    otherHrEmployees: formData.otherHrEmployee,
+    otherHrExperience: formData.otherHrExperience,
+
     keyValueProposition:formData.keyValueProposition,
-    stakeholders:formData.stakeholders && formData.stakeholders.length > 0 ? JSON.stringify(formData.stakeholders) : null,
-    companyCollaterals:formData.companyCollaterals && formData.companyCollaterals.length > 0 ? JSON.stringify(formData.companyCollaterals) : null,
-    companyReferrals:formData.companyReferrals && formData.companyReferrals.length > 0 ? JSON.stringify(formData.companyReferrals) : null,
-   })
-  
-  
+   });
 
-    // await db.query(query, values);
+   for(const typeName of formData.investmentType){
+    const [investmentTypeData] = await InvestmentType.findOrCreate({
+      where: { InvestmentType: typeName }
+    });
 
- // Log the successful registration
- logger.info(`Company successfully registerd`);
+    await CompanyInvestmentType.create({
+      companyId: company.id, 
+      InvestmentTypeId: investmentTypeData.id
+    });
+  }
+
+  for(const market of formData.marketPresence){
+    await MarketPrecence.create({
+      companyId: company.id,
+      regionName: market.region,
+      percentage: market.percentage.toString()
+    });
+  }
+
+  for(const collateral of formData.collaterals){
+    await Collaterals.create({
+      companyId: company.id,
+      collateralType: "Product",
+      collateralsLink: collateral
+    });
+  }
+
+  for(const referral of formData.referrals){
+    await Referrals.create({
+      companyId: company.id,
+      referralType: "Product",
+      referralLink: referral
+    });
+  }
+
+  for(const collateral of formData.companyCollaterals){
+    await Collaterals.create({
+      companyId: company.id,
+      collateralType: "Company",
+      collateralsLink: collateral
+    });
+  }
+
+  for(const referral of formData.companyReferrals){
+    await Referrals.create({
+      companyId: company.id,
+      referralType: "Company",
+      referralLink: referral
+    });
+  }
+
+  for(const stakeholder of formData.stakeholders){
+    await Stakeholders.create({
+      companyId: company.id,
+      workType: stakeholder.type,
+      workRole: stakeholder.role
+    });
+  }
+
+    logger.info(`Company successfully registerd`);
     
     res.status(201).json({ message: 'Registration data saved' });
   } catch (error) {
@@ -84,6 +201,8 @@ const registerPart1 = async (req, res) => {
     res.status(500).json({ error: 'An error occurred during registration' });
   }
 };
+
+// need to change according to new db
 
 // dashboard company count getting
 
@@ -174,4 +293,4 @@ const getCompanyStatistics = async (req, res) => {
 // };
 
 
-module.exports = {registerPart1,getCompanyStatistics};
+module.exports = { registerInvestor, registerCompany ,getCompanyStatistics };

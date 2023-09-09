@@ -19,6 +19,15 @@ const Meeting = require('./models/Meeting');
 const Notification = require('./models/Notification');
 const NotificationVisibility = require('./models/NotificationVisibility');
 const Investor = require('./models/Investor');
+const InvestorInvestmentType = require('./models/InvestorInvestmentType');
+const InvestmentType = require('./models/InvestmentType');
+const User = require('./models/User');
+const Company = require('./models/Company');
+const CompanyInvestmentType = require('./models/CompanyInvestmentType');
+const MarketPrecence = require('./models/MarketPrecence');
+const Collaterals = require('./models/Collaterals');
+const Referrals = require('./models/Referrals');
+const Stakeholders = require('./models/Stakeholders');
 
 app.use(bodyParser.json());
 app.use(cors(
@@ -32,8 +41,9 @@ app.use(cors(
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/register', registrationRoutes);
+
 app.use('/api/investors', investorRoutes);
-app.use('/api', registrationRoutes);
 app.use('/api/users', userRoute);
 app.use('/api/upload', s3Routes);
 app.use('/api/companies', companyRoutes);
@@ -46,8 +56,77 @@ const syncAllModels = async () => {
     await Meeting.sync();
     await Notification.sync();
     await NotificationVisibility.sync();
+    await User.sync();
+    await InvestmentType.sync();
     await Investor.sync();
+    await Company.sync();
+    await InvestorInvestmentType.sync();
+    await CompanyInvestmentType.sync();
+    await MarketPrecence.sync();
+    await Collaterals.sync();
+    await Referrals.sync();
+    await Stakeholders.sync();
 }
+
+InvestmentType.belongsToMany(Investor, {
+  through: InvestorInvestmentType,
+  foreignKey: 'InvestmentTypeId', // Foreign key in the junction table
+});
+
+Investor.belongsToMany(InvestmentType, {
+  through: InvestorInvestmentType,
+  foreignKey: 'InvestorId', // Foreign key in the junction table
+});
+
+InvestmentType.belongsToMany(Company, {
+  through: CompanyInvestmentType,
+  foreignKey: 'InvestmentTypeId', // Foreign key in the junction table
+});
+
+Company.belongsToMany(InvestmentType, {
+  through: CompanyInvestmentType,
+  foreignKey: 'companyId', // Foreign key in the junction table
+});
+
+Company.hasMany(MarketPrecence, {
+  foreignKey: 'companyId', // The foreign key in the Market table that references Company
+  as: 'marketPrecences', // This alias will be used when you access the associated markets
+});
+
+MarketPrecence.belongsTo(Company, {
+  foreignKey: 'companyId', // The foreign key in the MarketPrecence table that references Company
+});
+
+Company.hasMany(Collaterals, {
+  foreignKey: 'companyId', // The foreign key in the Collaterals table that references Company
+  as: 'collaterals', // This alias will be used when you access the associated collaterals
+});
+
+Collaterals.belongsTo(Company, {
+  foreignKey: 'companyId', // The foreign key in the Collaterals table that references Company
+});
+
+Company.hasMany(Referrals, {
+  foreignKey: 'companyId', // The foreign key in the Referrals table that references Company
+  as: 'referrals', // Use an alias for the association, e.g., 'referrals'
+});
+
+Referrals.belongsTo(Company, {
+  foreignKey: 'companyId', // The foreign key in the Referrals table that references Company
+});
+
+Company.hasMany(Stakeholders, {
+  foreignKey: 'companyId', // The foreign key in the Stakeholders table that references Company
+  as: 'stakeholders', // Use an alias for the association, e.g., 'stakeholders'
+});
+
+Stakeholders.belongsTo(Company, {
+  foreignKey: 'companyId', // The foreign key in the Stakeholders table that references Company
+});
+
+Investor.belongsTo(User, {
+  foreignKey: 'userId',
+});
 
 syncAllModels();
 

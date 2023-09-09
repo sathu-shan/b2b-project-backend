@@ -2,9 +2,6 @@ const Investor = require('../models/Investor'); // Use Sequelize Investor model
 const logger = require('../config/logger');
 const { Op } = require('sequelize'); // Import Sequelize's Op for query operations
 
-class InvestorController {
-}
-
 const registerInvestor = async (req, res) => {
   try {
     const { userId, firstName, lastName, country, address, companyRole, numberOfEmployees, assetsUnderManagement, investorType,
@@ -111,4 +108,4 @@ const getInvestorStatistics = async (req, res) => {
   }
 };
 
-module.exports = {InvestorController,getInvestorStatistics, registerInvestor};
+module.exports = { getInvestorStatistics, registerInvestor };

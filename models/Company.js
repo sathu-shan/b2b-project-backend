@@ -4,49 +4,176 @@ const sequelize = require('../config/db'); // Path to your sequelize configurati
 class Company extends Model {}
 
 Company.init({
-  status: DataTypes.STRING,
-  companyName: DataTypes.STRING,
-  dateOfIncorporation: DataTypes.DATE,
-  partnershipType: DataTypes.STRING,
-  investmentType: DataTypes.STRING,
-  investmentTypeDescription: DataTypes.STRING,
-  elevatorPitch: DataTypes.STRING,
-  partnershipRequirement: DataTypes.STRING,
-  whatOnOffer: DataTypes.STRING,
-  isSustainable: DataTypes.STRING,
-  numberOfEmployees: DataTypes.STRING,
-  productMaturity: DataTypes.STRING,
-  productDescription: DataTypes.STRING,
-  technologyEmployed: DataTypes.STRING,
-  technologyEmployedDescription: DataTypes.STRING,
-  collaterals: DataTypes.JSON, 
-  referrals: DataTypes.JSON,
-  productIndustry1: DataTypes.STRING,
-  productIndustry2: DataTypes.STRING,
-  productIndustry3: DataTypes.STRING,
-  natureOfBusiness: DataTypes.STRING,
-  companyIndustry1: DataTypes.STRING,
-  companyIndustry2: DataTypes.STRING,
-  companyIndustry3: DataTypes.STRING,
-  businessProcess: DataTypes.STRING,
-  companyProducts: DataTypes.STRING,
-  companyResources: DataTypes.STRING,
-  managementEmployee: DataTypes.STRING,
-  managementExperience: DataTypes.STRING,
-  technicalEmployee: DataTypes.STRING,
-  technicalExperience: DataTypes.STRING,
-  adminEmployees: DataTypes.STRING,
-  adminExperience: DataTypes.STRING,
-  marketingEmployees: DataTypes.STRING,
-  marketingExperience: DataTypes.STRING,
-  otherHrField: DataTypes.STRING,
-  otherHrEmployee: DataTypes.STRING,
-  otherHrExperience: DataTypes.STRING,
-  keyValueProposition: DataTypes.STRING,
-  stakeholders: DataTypes.JSON,
-  companyCollaterals: DataTypes.JSON,
-  companyReferrals: DataTypes.JSON
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  companyName: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  dateOfIncorporation: {
+    type: DataTypes.DATE,
+    allowNull: false
+  },
+  partnershipType: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  investmentTypeDescription: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  elevatorPitch: { 
+     type: DataTypes.STRING,
+     allowNull: false
+  },
+  
+  partnershipRequirement: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  whatOnOffer: { 
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  isSustainable: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  numberOfEmployees: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  
+  productMaturity: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  productDescription: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  businessProblemSolved: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  numberOfInstallations: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  productType: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
 
+  technologyEmployed: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  technologyEmployedDescription: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productIndustry1: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  productIndustry2: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productIndustry3: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  productIndustry4: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+
+  natureOfBusiness: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  companyIndustry1: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  companyIndustry2: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  companyIndustry3: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  companyIndustry4: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  
+  businessProcess: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  companyProducts: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  companyResources: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  managementEmployees: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  managementExperience: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  technicalEmployees: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  technicalExperience: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },  
+  adminEmployees: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  adminExperience: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  marketingEmployees: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  marketingExperience: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },  
+  otherHrField: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  otherHrEmployees: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  otherHrExperience: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+
+  keyValueProposition: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
 }, {
   sequelize,
   modelName: 'Company',
