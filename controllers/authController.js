@@ -78,6 +78,48 @@ const loginUser = async (req, res) => {
   }
 }
 
+const getOneUser = async (req, res) => {
+  try{
+    const user = await User.findByPk(req.params.id,{
+      attributes: ['id', 'email', 'companyName', 'contactNumber', 'displayName']
+    });
+
+    return res.status(200).json(user);
+  }catch(error){
+    console.error('Error while logging in:', error);
+    return res.status(500).json({ message: 'Internal Server Error', status: 500 });
+  }
+}
+
+const changeUserPassword = async (req, res) => {
+  try{
+    const { id, oldPassword, newPassword } = req.body;
+    const user = await User.findByPk(id);
+
+    const isOldPasswordsSame = await bcrypt.compare(oldPassword, user.password);
+
+    if(!isOldPasswordsSame){
+      return res.status(406).json({ message: 'Passwords did not match' });
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+
+    await User.update({
+      password: newPasswordHash
+    },{
+      where: {
+        id: id
+      }
+    });
+
+    return res.status(200).json({ message: 'Passwords reset' });
+
+  }catch(error){
+    console.error('Error while logging in:', error);
+    return res.status(500).json({ message: 'Internal Server Error', status: 500 });
+  }
+}
+
 // Validation functions
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -104,5 +146,7 @@ function isValidDisplayName(displayName) {
 
 module.exports = {
   signUpUser,
-  loginUser
+  loginUser,
+  getOneUser,
+  changeUserPassword,
 }
