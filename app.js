@@ -45,10 +45,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/register', registrationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/investors', investorRoutes);
+app.use('/api/companies', companyRoutes);
 
 app.use('/api/users', userRoute);
 app.use('/api/upload', s3Routes);
-app.use('/api/companies', companyRoutes);
 app.use('/api/meetings', meetingRoutes);
 app.use('/api/notification', notificationRoutes);
 

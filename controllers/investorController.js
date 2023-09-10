@@ -2,6 +2,7 @@ const { Sequelize } = require("sequelize");
 
 const Investor = require('../models/Investor');
 const InvestmentType = require('../models/InvestmentType');
+const User = require('../models/User');
 
 const getAllInvestors = async (req, res) => {
   try{
@@ -155,9 +156,69 @@ const getAllInvestorCount = async (req, res) => {
   }
 }
 
+const acceptRequest = async (req, res) => {
+  try{
+    await Investor.update({
+      status: 'Approved'
+    },{
+      where: {
+        id: req.params.id
+      }
+    });
+    
+    return res.status(200).json({ message: 'Company Approved' });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
+const rejectRequest = async (req, res) => {
+  try{
+    const investor = await Investor.findByPk(req.params.id);
+    const userId = investor.userId;
+
+    await Investor.destroy({
+      where: {
+        id: req.params.id,
+      }
+    });
+
+    await User.destroy({
+      where: {
+        id: userId
+      }
+    });
+
+    return res.status(200).json({ message: 'Company Deleted' });
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
+const getSingleInvestor = async (req, res) => {
+  try{
+    const investor = await Investor.findByPk(req.params.id, {
+      attributes: ['id', 'status', 'firstName', 'lastName', 'country', 'address', 'companyRole', 'numberOfEmployees', 
+      'assetsUnderManagement', 'investorType', 'investmentIndustryPreference1', 'investmentIndustryPreference2', 
+      'investmentIndustryPreference3', 'investmentIndustryPreference4']
+    });
+
+    return res.status(200).json(investor);
+
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch investor counts' });
+  }
+}
+
 module.exports = { 
   getAllInvestors,
   searchInvestors,
   filterInvestors,
-  getAllInvestorCount
+  getAllInvestorCount,
+  acceptRequest,
+  rejectRequest,
+  getSingleInvestor
 };
