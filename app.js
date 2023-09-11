@@ -146,7 +146,7 @@ const createWhenInit = async () => {
   console.log('Initialized');
 }
 
-createWhenInit();
+//createWhenInit();
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
