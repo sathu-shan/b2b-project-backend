@@ -159,7 +159,7 @@ const approveCompanyRequest = async (req, res) => {
 const deleteCompanyRequest = async (req, res) => {
     try {
         const company = await Company.findByPk(req.params.id);
-        const userId = investor.userId;
+        const userId = company.userId;
 
         await Company.destroy({
             where: {
